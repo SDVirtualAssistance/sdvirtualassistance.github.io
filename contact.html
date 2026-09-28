@@ -8,13 +8,36 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Status banner styling for form submission feedback */
+    .form-status {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .form-status.success {
+      display: block;
+      background-color: #f0fdf4;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+    .form-status.error {
+      display: block;
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+  </style>
 </head>
 <body>
 
   <!-- Header -->
   <header class="site-header">
     <div class="container nav-wrapper">
-      <a href="index.html" class="site-logo">
+      <a href="index.html" class="site-logo" aria-label="SDVirtual Home">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 50" width="180" height="38">
           <defs>
             <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -81,7 +104,7 @@
             <!-- Facebook Card -->
             <a href="https://www.facebook.com/derosa.shergeon/" target="_blank" rel="noopener noreferrer" class="channel-card">
               <div class="channel-info">
-                <div class="channel-icon">FB</div>
+                <div class="channel-icon">fb</div>
                 <div class="channel-details">
                   <label>FACEBOOK PROFILE</label>
                   <span>Shergeon De Rosa</span>
@@ -93,22 +116,37 @@
           </div>
         </div>
 
-        <!-- Contact Form -->
+        <!-- Google Sheets Connected Contact Form -->
         <div class="form-card">
-          <form onsubmit="event.preventDefault(); alert('Thank you! Your message has been submitted.');">
+          <form id="sheetContactForm">
             <div class="form-group">
               <label for="name">Your Name</label>
-              <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+              <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
             </div>
+
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+              <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
             </div>
+
+            <div class="form-group">
+              <label for="subject">Project Type / Service</label>
+              <select id="subject" name="subject" class="form-control">
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Data Entry & Auditing">Data Entry &amp; Auditing</option>
+                <option value="Spreadsheet / Excel Help">Spreadsheet / Excel Help</option>
+                <option value="Web Research & Lead Generation">Web Research &amp; Lead Generation</option>
+                <option value="Virtual Assistant Role">Full-time / Part-time VA Role</option>
+              </select>
+            </div>
+
             <div class="form-group">
               <label for="message">Message</label>
-              <textarea id="message" rows="4" class="form-control" placeholder="How can Shergeon assist you?" required></textarea>
+              <textarea id="message" name="message" rows="4" class="form-control" placeholder="How can Shergeon assist you?" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%;">Send Message</button>
+            <div id="formStatus" class="form-status"></div>
           </form>
         </div>
       </div>
@@ -123,6 +161,53 @@
       <p>© 2026 Shergeon De Rosa. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Script handler sending JSON data to Google Apps Script -->
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyA9r50UJKmGN4zvXJIErej44bxhJRtiEbSogbqBYWM-QW80ZSjffYb5sN168SW0Zri/exec';
+
+    const form = document.getElementById('sheetContactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formStatus = document.getElementById('formStatus');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      // Package form values as a JSON payload
+      const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value
+      };
+
+      // Send as text/plain to avoid CORS preflight blocks
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        formStatus.className = 'form-status success';
+        formStatus.textContent = 'Thank you! Your message has been saved and sent to Shergeon.';
+        form.reset();
+      })
+      .catch(error => {
+        formStatus.className = 'form-status error';
+        formStatus.textContent = 'Oops! Something went wrong. Please try again or email directly.';
+        console.error('Error!', error);
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      });
+    });
+  </script>
 
 </body>
 </html>
