@@ -11,6 +11,7 @@
 </head>
 <body>
 
+
   <!-- Header -->
   <header class="site-header">
     <div class="container nav-wrapper">
@@ -47,11 +48,11 @@
 
       <!-- NEW: Filter Buttons -->
       <div class="portfolio-filter">
-        <button class="filter-btn active" onclick="filterProjects('all')">All Work</button>
-        <button class="filter-btn" onclick="filterProjects('spreadsheets')">Spreadsheet Trackers</button>
-        <button class="filter-btn" onclick="filterProjects('automation')">Data Automation</button>
-        <button class="filter-btn" onclick="filterProjects('cleaning')">Data Cleaning</button>
-        <button class="filter-btn" onclick="filterProjects('research')">Web Research</button>
+        <button class="filter-btn active" onclick="filterProjects('all', this)">All Work</button>
+	<button class="filter-btn" onclick="filterProjects('spreadsheets', this)">Spreadsheets</button>
+	<button class="filter-btn" onclick="filterProjects('automation', this)">Automation</button>
+	<button class="filter-btn" onclick="filterProjects('cleaning', this)">Data Cleaning</button>
+	<button class="filter-btn" onclick="filterProjects('research', this)">Research</button>
       </div>
 
       <!-- Projects Grid -->
@@ -243,21 +244,24 @@
 
   <!-- Optional Light Filter Script -->
   <script>
-    function filterProjects(category) {
-      const cards = document.querySelectorAll('.project-card');
-      const buttons = document.querySelectorAll('.filter-btn');
+    function filterProjects(category, button) {
+  const cards = document.querySelectorAll('.project-card');
+  const buttons = document.querySelectorAll('.filter-btn');
 
-      buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  button.classList.add('active');
 
-      cards.forEach(card => {
-        if (category === 'all' || card.getAttribute('data-category') === category) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+  cards.forEach(card => {
+    if (
+      category === 'all' ||
+      card.getAttribute('data-category') === category
+    ) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
     }
+  });
+}
   </script>
 
 </body>
